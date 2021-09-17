@@ -1,9 +1,50 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from itertools import cycle
+import webbrowser
 import random
 import string
 import sys 
 import os
+
+class AboutDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super(AboutDialog, self).__init__()
+        self.setupUi()
+    
+    def setupUi(self):        
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("files/icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+        self.setFixedSize(300, 100)
+        self.setWindowTitle("About us")
+
+        discription = QtWidgets.QLabel(self)
+        discription.setGeometry(75, 10, 150, 30)
+        discription.setAlignment(QtCore.Qt.AlignCenter)
+        discription.setText("This program made by Sina.f")
+        
+        horizontalLayoutWidget = QtWidgets.QWidget(self)
+        horizontalLayoutWidget.setGeometry(15, 50, 270, 40)
+        horizontalLayout = QtWidgets.QHBoxLayout(horizontalLayoutWidget)
+        horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        horizontalLayout.setSpacing(12)
+        
+        btn_github = QtWidgets.QPushButton(horizontalLayoutWidget)
+        btn_github.setText("GitHub")
+        btn_github.clicked.connect(lambda: webbrowser.open('https://github.com/sina-programer'))
+        
+        btn_instagram = QtWidgets.QPushButton(horizontalLayoutWidget)
+        btn_instagram.setText("Instagram")
+        btn_instagram.clicked.connect(lambda: webbrowser.open('https://www.instagram.com/sina.programer'))
+        
+        btn_telegram = QtWidgets.QPushButton(horizontalLayoutWidget)
+        btn_telegram.setText("Telegram")
+        btn_telegram.clicked.connect(lambda: webbrowser.open('https://t.me/sina_programer'))
+        
+        horizontalLayout.addWidget(btn_github)
+        horizontalLayout.addWidget(btn_instagram)
+        horizontalLayout.addWidget(btn_telegram)
+
 
 class Cryptographer:
     def cryptography(self, fileName, newName, key:bytes):
@@ -39,6 +80,7 @@ class Widget(QtWidgets.QMainWindow):
     def __init__(self):
         super(Widget, self).__init__()
         self.cryptographer = Cryptographer()
+        self.aboutDialog = AboutDialog()
         self.key = None
         
         if os.path.exists(r'files\icon.ico'):
@@ -125,14 +167,11 @@ class Widget(QtWidgets.QMainWindow):
         
         tabWidget.addTab(encoderTab, encoderTab_icon, '')
         tabWidget.setTabText(tabWidget.indexOf(encoderTab), "Encrypt  ")
-        tabWidget.setTabToolTip(tabWidget.indexOf(encoderTab), 
-            "<html><head/><body><p>You can encrypt your files here</p></body></html>")
+        tabWidget.setTabToolTip(tabWidget.indexOf(encoderTab), "<html><head/><body><p>You can encrypt your files here</p></body></html>")
         
         tabWidget.addTab(decoderTab, decoderTab_icon, '')
         tabWidget.setTabText(tabWidget.indexOf(decoderTab), "Decrypt   ")
-        tabWidget.setTabToolTip(tabWidget.indexOf(decoderTab), 
-            "<html><head/><body><p>You can decrypt your files here</p></body></html>")
-        
+        tabWidget.setTabToolTip(tabWidget.indexOf(decoderTab), "<html><head/><body><p>You can decrypt your files here</p></body></html>")
         
         self.init_menu()
 
@@ -141,19 +180,16 @@ class Widget(QtWidgets.QMainWindow):
             file_path = self.file_path_lineE_encoderTab.text()
             
             if file_path:            
-                save_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, 
-                         'Save Encrypt File', '', "Encrypt Files (*.encrypt)")
+                save_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Encrypt File', '', "Encrypt Files (*.encrypt)")
     
                 if save_path:         
                     self.cryptographer.cryptography(file_path, save_path, self.key)
                         
             else:
-                QtWidgets.QMessageBox.critical(self, 'ERROR', 
-                                           '\nPlease open a file for encrypt!\t\n')
+                QtWidgets.QMessageBox.critical(self, 'ERROR', '\nPlease open a file for encrypt!\t\n')
                     
         else:
-            QtWidgets.QMessageBox.critical(self, 'ERROR', 
-                                           '\nPlease first load a KEY!\t\n')
+            QtWidgets.QMessageBox.critical(self, 'ERROR', '\nPlease first load a KEY!\t\n')
                          
     def decrypt(self):
         if self.key:
@@ -166,16 +202,13 @@ class Widget(QtWidgets.QMainWindow):
                     self.cryptographer.cryptography(file_path, save_path, self.key)
                         
             else:
-                QtWidgets.QMessageBox.critical(self, 'ERROR', 
-                                           '\nPlease open a file for decrypt!\t\n')
+                QtWidgets.QMessageBox.critical(self, 'ERROR', '\nPlease open a file for decrypt!\t\n')
                     
         else:
-            QtWidgets.QMessageBox.critical(self, 'ERROR', 
-                                           '\nPlease first load a KEY!\t\n')
+            QtWidgets.QMessageBox.critical(self, 'ERROR', '\nPlease first load a KEY!\t\n')
     
     def load_key(self):
-        key_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-                            self, 'Open Key File', '', "Key Files (*.key)")
+        key_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Key File', '', "Key Files (*.key)")
         
         if key_path:
             key_name = os.path.basename(key_path)
@@ -184,8 +217,7 @@ class Widget(QtWidgets.QMainWindow):
             self.key = self.cryptographer.load_key(key_path)
 
     def generate_key(self):
-        key_path, _ = QtWidgets.QFileDialog.getSaveFileName(
-                            self, 'Save Key File', '', "Key Files (*.key)")
+        key_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Key File', '', "Key Files (*.key)")
         
         if key_path:
             self.cryptographer.generate_key(key_path)
@@ -196,19 +228,16 @@ class Widget(QtWidgets.QMainWindow):
             self.file_path_lineE_encoderTab.setText(file_path)
                
     def open_decode_file(self):
-        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Open File', '', "Encrypt Files (*.encrypt)")
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', '', "Encrypt Files (*.encrypt)")
         if file_path:
             self.file_path_lineE_decoderTab.setText(file_path)
             
     def init_menu(self):
-        aboutAction = QtWidgets.QAction('About us', self)
-        aboutAction.triggered.connect(lambda: QtWidgets.QMessageBox.information(
-                                        self, 'About us', about_msg))
-        
         helpAction = QtWidgets.QAction('Help', self)
-        helpAction.triggered.connect(lambda: QtWidgets.QMessageBox.information(
-                                        self, 'Help', help_msg))
+        helpAction.triggered.connect(lambda: QtWidgets.QMessageBox.information(self, 'Help', help_msg))
+        
+        aboutAction = QtWidgets.QAction('About us', self)
+        aboutAction.triggered.connect(lambda: self.aboutDialog.exec_())
         
         menu = self.menuBar()
         menu.addAction(helpAction)
@@ -220,10 +249,6 @@ help_msg = '''\n1_ Load a key (if you don't have any key, generate a key then lo
 3_ Press encrypt/decrypt button and choose save path
 4_ Your file is ready now!\t\n'''
 
-about_msg = '''\nThis program made by Sina.f\t\n
-GitHub: sina-programer
-Telegram: sina_programer
-Instagram: sina.programer\t\n'''
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
